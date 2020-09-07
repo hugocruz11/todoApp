@@ -6,6 +6,11 @@ export default (state = initialState, action) => {
   switch (action.type) {
     case ActionType.CLEAR_DATA:
       return initialState;
+    case ActionType.SET_ITEMS:
+      return {
+        ...state,
+        Items: action.data,
+      };
     case ActionType.ADD_ITEM:
       return {
         ...state,
