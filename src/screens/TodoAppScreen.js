@@ -3,7 +3,7 @@ import { Container, Header, Left, Body, Title } from 'native-base';
 import { View, StyleSheet } from 'react-native';
 import { TodoButton, FlatListComponent } from '../components';
 import { ImageTodoAppServices } from '../services';
-import { addItem } from '../actions/TodoAppActions';
+import { addItem, setItems } from '../actions/TodoAppActions';
 import { connect } from 'react-redux';
 
 class TodoAppScreen extends Component {
@@ -69,12 +69,45 @@ class TodoAppScreen extends Component {
             }}
           />
         </View>
+        <View style={styles.contentButtons}>
+          <TodoButton
+            color='#FFFFFF'
+            title='Orden Parabolico'
+            onPress={() => {
+              this.sortParabolical();
+            }}
+          />
+        </View>
       </View>
     );
   }
 
+  sortParabolical() {
+    let todoItemsAux = this.state.todoItems;
+    let { todoItemsReal } = this.state;
+    const sortedTodos = todoItemsAux.sort(
+      (a, b) => b.name.length - a.name.length
+    );
+    const parabolicalSort = [];
+    let isTop = false;
+    while (sortedTodos.length > 0) {
+      if (isTop) {
+        parabolicalSort.unshift(sortedTodos[0]);
+      } else {
+        parabolicalSort.push(sortedTodos[0]);
+      }
+      sortedTodos.shift();
+      isTop = !isTop;
+    }
+    return this.setState({
+      todoItems: parabolicalSort,
+      todoItemsReal,
+    });
+  }
+
   alphabeticalOrder() {
     let todoItemsAux = this.state.todoItems;
+    let { todoItemsReal } = this.state;
     todoItemsAux.sort(function (a, b) {
       if (a.name < b.name) {
         return -1;
@@ -138,6 +171,7 @@ class TodoAppScreen extends Component {
         this.setState({
           todoItems: items,
         });
+        this.props.setItems(items);
       })
       .catch((error) => {
         console.log(error);
@@ -151,8 +185,8 @@ class TodoAppScreen extends Component {
       let items = [...this.state.todoItems, item];
       this.setState({
         todoItems: items,
-        todoItemsReal: items,
       });
+      this.props.setItems(items);
     }
   }
 
@@ -191,6 +225,7 @@ const styles = StyleSheet.create({
 
 const mapDispatchToProps = {
   addItem,
+  setItems,
 };
 
 export default connect(null, mapDispatchToProps)(TodoAppScreen);
